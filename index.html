@@ -1722,11 +1722,13 @@ h3 {
     <input type="date" id="date-picker" onchange="updateFormattedDate()">
     <input type="text" id="formatted-date" placeholder="JJ/MM/AAAA" readonly>
   </div>
-
+  
   <div class="comments-container">
     <h3>Commentaires</h3>
     <textarea id="comments" placeholder="Ajoutez vos commentaires ici..." rows="4" cols="50"></textarea>
-  </div>
+</div>
+
+
   
   <div class="buttons">
   
@@ -2002,7 +2004,8 @@ h3 {
               
               <div id="fetchline-services-17" class="p-services-table-subtotal-2">  
 
-
+                0,00 $
+                
               </div>
 
             </div>
@@ -2017,6 +2020,7 @@ h3 {
               
               <div id="fetchline-services-18" class="p-services-table-taxes-2">  
 
+                0,00 $
 
               </div>
 
@@ -2032,6 +2036,7 @@ h3 {
               
               <div id="fetchline-services-19" class="p-services-table-total-2">  
 
+                0,00 $
 
               </div>
 
@@ -2045,20 +2050,15 @@ h3 {
       
       <div class="p-h-spacer"></div>
       
-      <div class="p-comment">  
-  
-        <div class="p-comment-title">  
-  
-          COMMENTAIRES (SI APPLICABLE)
-    
-        </div>
-        
-        <div class="p-comment-box">  
-  
-    
-        </div>
-    
-      </div>
+      <div class="p-comment">
+    <div class="p-comment-title">  
+        COMMENTAIRES
+    </div>
+    <div id="fetchline-comments" class="p-comment-box">  
+        Aucun commentaire
+    </div>
+</div>
+
       
       <div class="p-h-spacer"></div>
       
@@ -2148,23 +2148,28 @@ h3 {
         }
 
          function updateTotals() {
-        let subtotal = 0;
-        for (let i = 1; i <= productCount; i++) {
-            const priceField = document.getElementById(`product-price-${i}`);
-            if (priceField && priceField.value) {
-                let value = parseFloat(priceField.value.replace(/[^\d.,]/g, '').replace(',', '.'));
-                if (!isNaN(value)) subtotal += value;
-            }
+    let subtotal = 0;
+    for (let i = 1; i <= productCount; i++) {
+        const priceField = document.getElementById(`product-price-${i}`);
+        if (priceField && priceField.value) {
+            let value = parseFloat(priceField.value.replace(/[^\d.,]/g, '').replace(',', '.'));
+            if (!isNaN(value)) subtotal += value;
         }
-        let taxes = subtotal * 0.14975;
-        let total = subtotal + taxes;
-
-        // Gestion de la case "Cacher les totaux"
-        const hideTotalsChecked = document.getElementById("hide-totals").checked;
-        document.getElementById("subtotal").value = hideTotalsChecked ? "" : subtotal.toFixed(2).replace('.', ',') + " $";
-        document.getElementById("taxes").value = hideTotalsChecked ? "" : taxes.toFixed(2).replace('.', ',') + " $";
-        document.getElementById("total").value = hideTotalsChecked ? "" : total.toFixed(2).replace('.', ',') + " $";
     }
+    let taxes = subtotal * 0.14975;
+    let total = subtotal + taxes;
+
+    const hideTotalsChecked = document.getElementById("hide-totals").checked;
+    document.getElementById("subtotal").value = hideTotalsChecked ? "" : subtotal.toFixed(2).replace('.', ',') + " $";
+    document.getElementById("taxes").value = hideTotalsChecked ? "" : taxes.toFixed(2).replace('.', ',') + " $";
+    document.getElementById("total").value = hideTotalsChecked ? "" : total.toFixed(2).replace('.', ',') + " $";
+
+    // ✅ Mettre à jour les valeurs dans la page immédiatement
+    document.getElementById("fetchline-services-17").textContent = document.getElementById("subtotal").value;
+    document.getElementById("fetchline-services-18").textContent = document.getElementById("taxes").value;
+    document.getElementById("fetchline-services-19").textContent = document.getElementById("total").value;
+}
+
       
       document.getElementById("hide-totals").addEventListener("change", updateTotals);
 
@@ -2231,9 +2236,15 @@ h3 {
     document.getElementById("fetchline-services-17").textContent = document.getElementById("subtotal").value;
     document.getElementById("fetchline-services-18").textContent = document.getElementById("taxes").value;
     document.getElementById("fetchline-services-19").textContent = document.getElementById("total").value;
-  }
+}
+    
+    document.getElementById("comments").addEventListener("input", function () {
+    let commentText = this.value.trim();
+    document.getElementById("fetchline-comments").textContent = commentText || "Aucun commentaire";
+});
 
-
+    
+    
   // Mettre à jour les divs toutes les secondes
   setInterval(updateDivs, 1000);
 
