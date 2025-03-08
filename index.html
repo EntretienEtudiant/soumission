@@ -121,6 +121,7 @@ body {
   font-family: RobotoCondensed;
   font-style: normal;
   font-weight: normal;
+  zoom: 80%;
 }
   
 .program {
@@ -133,6 +134,7 @@ body {
   display: flex;
   flex-direction: column;
   padding: 50px;
+  border-right: 0px solid #bad1d6;
 }
   
 h1 {
@@ -149,10 +151,11 @@ h1 {
   flex-direction: column;
   width: 8.5in;
   height: 11in;
-  border: 1px solid black;
+  border: none !important;
   background-image: url('https://i.imgur.com/jtYS3lI.png');
   background-repeat: no-repeat;
   background-size: cover; 
+  box-shadow: 5px 5px 20px #888888;
 }
   
 .client {
@@ -961,6 +964,8 @@ h3 {
   scale: 4;
 }    
   
+
+  
 body {
   font-family: RobotoCondensed;
   font-style: normal;
@@ -1747,7 +1752,10 @@ h3 {
   </div>
   
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+
+
   
 </div>
   
@@ -2255,31 +2263,38 @@ h3 {
     const { jsPDF } = window.jspdf;
     const element = document.querySelector(".page");
 
-    // Récupérer le nom du client
     let clientName = document.getElementById("fetchline-info-1").innerText.trim();
-    if (!clientName) clientName = "Sans Nom"; // Valeur par défaut si vide
-
-    // Construire le nom du fichier
+    if (!clientName) clientName = "Sans Nom";
     const fileName = `Soumission - ${clientName}.pdf`;
 
+    // Dimensions précises pour A4 (8.5" x 11") en pixels à 300 DPI
+    const PDF_WIDTH = 8.5 * 96;  // 8.5 pouces * 96 DPI
+    const PDF_HEIGHT = 11 * 96;  // 11 pouces * 96 DPI
+
+    // Appliquer une taille fixe à la page pour garantir l'impression correcte
+    element.style.width = `${PDF_WIDTH}px`;
+    element.style.height = `${PDF_HEIGHT}px`;
+    element.style.maxWidth = "none";
+    element.style.maxHeight = "none";
+    element.style.overflow = "hidden"; // Empêche le débordement
+
     html2canvas(element, {
-        scale: 3,
+        scale: 3, // Améliore la qualité du rendu
         useCORS: true,
-        allowTaint: true,
-        backgroundColor: null
+        backgroundColor: "#ffffff"
     }).then(canvas => {
         const imgData = canvas.toDataURL("image/png");
-        const pdf = new jsPDF('p', 'mm', 'a4');
-        const imgWidth = 210;
-        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        const pdf = new jsPDF({
+            orientation: "portrait",
+            unit: "in",
+            format: [8.5, 11] // Définit précisément le format Letter (8,5 x 11 pouces)
+        });
 
-        if (imgHeight > 297) {
-            pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, 297);
-        } else {
-            pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
-        }
+        // Ajoute l'image en occupant exactement toute la page
+        pdf.addImage(imgData, "PNG", 0, 0, 8.5, 11);
 
-        pdf.save(fileName); // Téléchargement avec le bon titre
+        // Sauvegarde du fichier
+        pdf.save(fileName);
     });
 }
     
