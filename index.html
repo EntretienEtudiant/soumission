@@ -2092,10 +2092,25 @@ h3 {
 
         // 📌 Récupère la liste des clients depuis Pipedrive
         async function fetchClients() {
-            const response = await fetch(`https://${COMPANY_DOMAIN}/api/v1/persons?api_token=${API_TOKEN}`);
-            const data = await response.json();
-            return data.data || [];
+    const allClients = [];
+    let start = 0;
+    const limit = 100; // maximum autorisé par Pipedrive
+
+    while (true) {
+        const response = await fetch(`https://${COMPANY_DOMAIN}/api/v1/persons?start=${start}&limit=${limit}&api_token=${API_TOKEN}`);
+        const result = await response.json();
+
+        if (result.data && result.data.length > 0) {
+            allClients.push(...result.data);
+            start += limit;
+            if (!result.additional_data.pagination.more_items_in_collection) break;
+        } else {
+            break;
         }
+    }
+
+    return allClients;
+}
 
         async function populateClientList() {
             const clients = await fetchClients();
